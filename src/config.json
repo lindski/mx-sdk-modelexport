@@ -1,0 +1,11 @@
+{
+    "auth" : {
+        "username":"iain.lindsay@auraq.com",
+        "apikey":"3114a997-c565-4ef4-9ffd-9cdbeac43935"
+    },
+    "project":{
+        "id":"54925c30-0129-43c4-bf3f-68a5ea3f0475",
+        "name":"TrajeQt-DropboxDemo-IL",
+        "branch": ""
+    }
+}

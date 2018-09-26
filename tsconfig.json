@@ -1,0 +1,12 @@
+{
+    "compilerOptions" : {
+        "module" : "commonjs",
+        "target" : "es6",
+        "strict": true,
+        "outDir":"build",
+        "resolveJsonModule": true
+    },
+    "files" : [
+        "src/script.ts"
+    ]    
+}
