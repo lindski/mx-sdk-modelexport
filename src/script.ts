@@ -41,7 +41,7 @@ async function exportModuleSecurities(wc : OnlineWorkingCopy, projectPath : stri
         }
         const serialised = utils.serializeToJs(loadedSecurity);
         
-        var filepath = getSanitisedAndUniqueFilePath(modulePath, `${loadedSecurity.containerAsModule.name} (Security)`,'_');
+        var filepath = getSanitisedAndUniqueFilePath(modulePath, `__Security__`,'_');
         fs.writeFileSync(filepath,serialised );
     }
 }
@@ -112,7 +112,7 @@ function getModuleDocumentName(document : projects.ModuleDocument) : string {
         case "JsonStructures$JsonStructure":
                 return (document as jsonstructures.JsonStructure).name;          
         case "DomainModels$DomainModel":
-                return `${document.containerAsModule.name} (Domain Model)`;
+                return `__Domain Model__`;
         default:
             console.log(`Structure Type ${document.structureTypeName} not yet handled in getModuleDocumentName. Using Document ID for name.`);
             return document.id;
