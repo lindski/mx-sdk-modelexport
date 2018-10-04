@@ -4,4 +4,4 @@ build/*
 *nbproject
 .vscode/
 reference/
-out/
+out/*

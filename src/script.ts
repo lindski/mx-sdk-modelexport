@@ -1,5 +1,7 @@
 import {MendixSdkClient, Project, OnlineWorkingCopy, Revision, Branch} from 'mendixplatformsdk/dist';
-import {utils} from 'mendixmodelsdk/dist';
+import {utils, StructuralUnit, IStructuralUnit, projects, constants, 
+        javaactions, pages, microflows, enumerations, exportmappings, importmappings,
+        scheduledevents, xmlschemas, domainmodels, images, jsonstructures} from 'mendixmodelsdk/dist';
 import when = require('when');
 import config = require('./config.json');
 import fs = require('fs');
@@ -21,76 +23,99 @@ async function serialize(){
     }
 
     fs.mkdirSync(projectPath);
-
-    await exportConstants(wc, projectPath);
-    await exportDomainModels(wc, projectPath);
-    await exportEnumerations(wc, projectPath);
-    await exportMicroflows(wc, projectPath);
-    await exportPages(wc, projectPath);
-    await exportSnippets(wc, projectPath);
+    await exportModuleDocuments(wc, projectPath);
+    await exportModuleSecurities(wc, projectPath);
 }
 
 serialize();
 
-async function exportConstants(wc : OnlineWorkingCopy, basePath : string){
-    const interfaceElements = wc.model().allConstants();
+async function exportModuleSecurities(wc : OnlineWorkingCopy, projectPath : string){
+    const securities = wc.model().allModuleSecurities();
 
-    for(const interfaceElement of interfaceElements){
-        const element = await loadAsPromise(interfaceElement);
+    for(const security of securities){
+        const loadedSecurity = await loadAsPromise(security);     
+        const moduleName = loadedSecurity.containerAsModule.name;
+        const modulePath = path.join(projectPath, moduleName);
+        if( !fs.existsSync(modulePath)){
+            fs.mkdirSync(modulePath);
+        }
+        const serialised = utils.serializeToJs(loadedSecurity);
         
-        var filepath = getSanitisedAndUniqueFilePath(basePath, `${element.qualifiedName} [CONSTANT]`,'_');
-        fs.writeFileSync(filepath,utils.serializeToJs(element) );
+        var filepath = getSanitisedAndUniqueFilePath(modulePath, `${loadedSecurity.containerAsModule.name} (Security)`,'_');
+        fs.writeFileSync(filepath,serialised );
     }
 }
 
-async function exportDomainModels(wc : OnlineWorkingCopy, basePath : string){
-    const interfaceElements = wc.model().allDomainModels();
+async function exportModuleDocuments(wc : OnlineWorkingCopy, projectPath : string){
+    const documents = wc.model().allModuleDocuments();
 
-    for(const interfaceElement of interfaceElements){
-        const element = await loadAsPromise(interfaceElement);
+    for(const document of documents){
+        const moduleName = getContainingModuleName(document.container);
+        const modulePath = path.join(projectPath, moduleName);
+        if( !fs.existsSync(modulePath)){
+            fs.mkdirSync(modulePath);
+        }        
+
+        const loadedDocument = await loadAsPromise(document);
+        const serialised = utils.serializeToJs(loadedDocument);
         
-        var filepath = getSanitisedAndUniqueFilePath(basePath, `${element.containerAsModule.name} [DOMAIN MODEL]`,'_');
-        fs.writeFileSync(filepath,utils.serializeToJs(element) );
+        const documentName = getModuleDocumentName(loadedDocument);
+
+        var filepath = getSanitisedAndUniqueFilePath(modulePath, `${documentName}`,'_');
+        fs.writeFileSync(filepath,serialised );
     }
 }
 
-async function exportEnumerations(wc : OnlineWorkingCopy, basePath : string){
-    const interfaceElements = wc.model().allEnumerations();    
-    for(const interfaceElement of interfaceElements){
-        const element = await loadAsPromise(interfaceElement);
-        
-        var filepath = getSanitisedAndUniqueFilePath(basePath, `${element.qualifiedName} [ENUMERATION]`,'_');
-        fs.writeFileSync(filepath,utils.serializeToJs(element) );
+function getContainingModuleName(container : IStructuralUnit) : string{
+    if(container.structureTypeName === "Projects$Folder"){
+        return getContainingModuleName(container.container)
     }
+    else {
+        return (container as projects.Module).name
+    }    
 }
 
-async function exportMicroflows(wc : OnlineWorkingCopy, basePath : string){
-    const interfaceElements = wc.model().allMicroflows();
-
-    for(const interfaceElement of interfaceElements){
-        const element = await loadAsPromise(interfaceElement);        
-        var filepath = getSanitisedAndUniqueFilePath(basePath, `${element.qualifiedName} [MICROFLOW]`,'_');
-        fs.writeFileSync(filepath,utils.serializeToJs(element) );
-    }
-}
-
-async function exportPages(wc : OnlineWorkingCopy, basePath : string){
-    const interfaceElements = wc.model().allPages(); 
-
-    for(const interfaceElement of interfaceElements){
-        const element = await loadAsPromise(interfaceElement);        
-        var filepath = getSanitisedAndUniqueFilePath(basePath, `${element.qualifiedName} [PAGE]`,'_');
-        fs.writeFileSync(filepath,utils.serializeToJs(element) );
-    } 
-}
-
-async function exportSnippets(wc : OnlineWorkingCopy, basePath : string){
-    const interfaceElements = wc.model().allSnippets(); 
-
-    for(const interfaceElement of interfaceElements){
-        const element = await loadAsPromise(interfaceElement);        
-        var filepath = getSanitisedAndUniqueFilePath(basePath, `${element.qualifiedName} [SNIPPET]`,'_');
-        fs.writeFileSync(filepath,utils.serializeToJs(element) );
+function getModuleDocumentName(document : projects.ModuleDocument) : string {
+    switch(document.structureTypeName){
+        case "Constants$Constant":
+            return (document as constants.Constant).name;
+        case "JavaActions$JavaAction":
+                return (document as javaactions.JavaAction).name;
+        case "Pages$BuildingBlock":
+                return (document as pages.BuildingBlock).name;
+        case "Pages$Layout":
+                return (document as pages.Layout).name;
+        case "Pages$Page":
+                return (document as pages.Page).name;
+        case "Pages$Snippet":
+                return (document as pages.Snippet).name;   
+        case "Pages$PageTemplate":
+                return (document as pages.PageTemplate).name;             
+        case "Microflows$Nanoflow":
+                return (document as microflows.Nanoflow).name;               
+        case "Microflows$Rule":
+                return (document as microflows.Rule).name;             
+        case "Microflows$Microflow":
+                return (document as microflows.Microflow).name;             
+        case "Enumerations$Enumeration":
+                return (document as enumerations.Enumeration).name;               
+        case "ImportMappings$ImportMapping":
+                return (document as importmappings.ImportMapping).name;               
+        case "ExportMappings$ExportMapping":
+                return (document as exportmappings.ExportMapping).name;             
+        case "ScheduledEvents$ScheduledEvents":
+                return (document as scheduledevents.ScheduledEvent).name;           
+        case "XmlSchemas$XmlSchema":
+                return (document as xmlschemas.XmlSchema).name;                    
+        case "Images$ImageCollection":
+                return (document as images.ImageCollection).name;                    
+        case "JsonStructures$JsonStructure":
+                return (document as jsonstructures.JsonStructure).name;          
+        case "DomainModels$DomainModel":
+                return `${document.containerAsModule.name} (Domain Model)`;
+        default:
+            console.log(`Structure Type ${document.structureTypeName} not yet handled in getModuleDocumentName. Using Document ID for name.`);
+            return document.id;
     }
 }
     
