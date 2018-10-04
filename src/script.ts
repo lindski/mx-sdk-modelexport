@@ -103,7 +103,7 @@ function getModuleDocumentName(document : projects.ModuleDocument) : string {
                 return (document as importmappings.ImportMapping).name;               
         case "ExportMappings$ExportMapping":
                 return (document as exportmappings.ExportMapping).name;             
-        case "ScheduledEvents$ScheduledEvents":
+        case "ScheduledEvents$ScheduledEvent":
                 return (document as scheduledevents.ScheduledEvent).name;           
         case "XmlSchemas$XmlSchema":
                 return (document as xmlschemas.XmlSchema).name;                    
