@@ -14,8 +14,15 @@ const revision = new Revision(-1, new Branch(project,config.project.branch)); //
 async function serialize(){
     const wc : OnlineWorkingCopy = await client.platform().createOnlineWorkingCopy(project, revision);
     
+    // create the output folder
+    const basePath = './out';
+    if( !fs.existsSync(basePath)){
+        fs.mkdirSync(basePath);    
+    }
+
+    // check for project folder
     const projectName = wc.project().name();
-    const projectPath = `./out/${projectName}`;
+    const projectPath = path.join(basePath, projectName);
 
     if( fs.existsSync(projectPath)){
         console.log("Project output folder ${projectPath} already exists. Please delete the project output folder and try again");

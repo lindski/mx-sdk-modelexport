@@ -58,4 +58,4 @@ Run the script with the following command:
 
 `npm start`
 
-Once the script has completed you can update your project in the modeller to see the new microflows.
+The script will create a folder named after the project and sub folders for each module. Module objects will be saved to the appropriate module folder.
