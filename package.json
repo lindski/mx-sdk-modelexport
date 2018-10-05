@@ -1,5 +1,5 @@
 {
-  "name": "mx-sdk-validationcreator",
+  "name": "mx-sdk-modelexport",
   "version": "1.0.0",
   "description": "",
   "scripts": {
@@ -8,6 +8,10 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lindski/mx-sdk-modelexport.git"
+  },
   "dependencies": {
     "@types/when": "^2.4.28",
     "mendixmodelsdk": "~4.14.0",
