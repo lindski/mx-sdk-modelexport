@@ -58,4 +58,8 @@ Run the script with the following command:
 
 `npm start`
 
-The script will create a folder named after the project and sub folders for each module. Module objects will be saved to the appropriate module folder.
+The script will do the following:
+
+- create a folder called 'out' if it doesn't already exist
+- create a folder named after the project. If one already exists the script will exit. 
+- iterate over every ModuleSecurity and ModuleDocument object and store them in module specific sub folders under the project.
