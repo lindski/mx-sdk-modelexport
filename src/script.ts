@@ -25,7 +25,7 @@ async function serialize(){
     const projectPath = path.join(basePath, projectName);
 
     if( fs.existsSync(projectPath)){
-        console.log("Project output folder ${projectPath} already exists. Please delete the project output folder and try again");
+        console.log(`Project output folder ${projectPath} already exists. Please delete the project output folder and try again`);
         return;    
     }
 
@@ -129,6 +129,9 @@ function getModuleDocumentName(document : projects.ModuleDocument) : string {
 function getSanitisedAndUniqueFilePath(basePath : string, filename : string | null, replaceValue : string, attempt : number = 1) : string {
     filename = filename || "";
     filename = filename.replace(/[/\\?%*:|"<>]/g, replaceValue);
+    if(!filename.endsWith(".js")){
+        filename += '.js';
+    }
     let filePath = path.join(basePath, filename);
 
     if(fs.existsSync(filePath)){
