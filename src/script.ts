@@ -1,7 +1,7 @@
 import {MendixSdkClient, Project, OnlineWorkingCopy, Revision, Branch} from 'mendixplatformsdk/dist';
-import {utils, StructuralUnit, IStructuralUnit, projects, constants, 
+import {JavaScriptSerializer, StructuralUnit, IStructuralUnit, projects, constants, 
         javaactions, pages, microflows, enumerations, exportmappings, importmappings,
-        scheduledevents, xmlschemas, domainmodels, images, jsonstructures} from 'mendixmodelsdk/dist';
+        scheduledevents, xmlschemas, domainmodels, images, jsonstructures, security} from 'mendixmodelsdk/dist';
 import when = require('when');
 import config = require('./config.json');
 import fs = require('fs');
@@ -40,14 +40,14 @@ async function exportModuleSecurities(wc : OnlineWorkingCopy, projectPath : stri
     const securities = wc.model().allModuleSecurities();
 
     for(const security of securities){
-        const loadedSecurity = await loadAsPromise(security);     
+        const loadedSecurity = await loadAsPromise<security.IModuleSecurity>(security);     
         const moduleName = loadedSecurity.containerAsModule.name;
         const modulePath = path.join(projectPath, moduleName);
         if( !fs.existsSync(modulePath)){
             fs.mkdirSync(modulePath);
         }
-        const serialised = utils.serializeToJs(loadedSecurity);
-        
+        const serialised = JavaScriptSerializer.serializeToJs(loadedSecurity);
+    
         var filepath = getSanitisedAndUniqueFilePath(modulePath, `__Security__`,'_');
         fs.writeFileSync(filepath,serialised );
     }
@@ -63,8 +63,8 @@ async function exportModuleDocuments(wc : OnlineWorkingCopy, projectPath : strin
             fs.mkdirSync(modulePath);
         }        
 
-        const loadedDocument = await loadAsPromise(document);
-        const serialised = utils.serializeToJs(loadedDocument);
+        const loadedDocument = await loadAsPromise<projects.ModuleDocument>(document);
+        const serialised = JavaScriptSerializer.serializeToJs(loadedDocument);
         
         const documentName = getModuleDocumentName(loadedDocument);
 

@@ -12,7 +12,7 @@ Install project dependencies by running the following command
 
 ## Configuration
 
-In the src folder, update the file config.json.
+In the src folder, create a file config.json (see config.json.example for a sample).
 
 ### auth
 
