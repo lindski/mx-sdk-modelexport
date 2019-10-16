@@ -50,11 +50,7 @@ In the src folder, create a file config.json (see config.json.example for a samp
 **project.branch**: The name of the branch you want to use (or empty string for the main line)  
 
 ## Run the script
-Compile the script by running the following command:
-
-`tsc`
-
-Run the script with the following command:
+Compile and run the script by running the following command:
 
 `npm start`
 
