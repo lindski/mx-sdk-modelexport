@@ -39,6 +39,7 @@ serialize();
 async function exportModuleSecurities(wc : OnlineWorkingCopy, projectPath : string){
     const securities = wc.model().allModuleSecurities();
 
+    console.log(`--> Module Security`);
     for(const security of securities){
         const loadedSecurity = await loadAsPromise<security.IModuleSecurity>(security);     
         const moduleName = loadedSecurity.containerAsModule.name;
@@ -46,16 +47,18 @@ async function exportModuleSecurities(wc : OnlineWorkingCopy, projectPath : stri
         if( !fs.existsSync(modulePath)){
             fs.mkdirSync(modulePath);
         }
+        console.log(`\t ${moduleName}`);
         const serialised = JavaScriptSerializer.serializeToJs(loadedSecurity);
     
         var filepath = getSanitisedAndUniqueFilePath(modulePath, `__Security__`,'_');
         fs.writeFileSync(filepath,serialised );
     }
+    console.log(`<-- Module Security`);
 }
 
 async function exportModuleDocuments(wc : OnlineWorkingCopy, projectPath : string){
     const documents = wc.model().allModuleDocuments();
-
+    console.log(`--> Module Documents`);
     for(const document of documents){
         const moduleName = getContainingModuleName(document.container);
         const modulePath = path.join(projectPath, moduleName);
@@ -67,10 +70,12 @@ async function exportModuleDocuments(wc : OnlineWorkingCopy, projectPath : strin
         const serialised = JavaScriptSerializer.serializeToJs(loadedDocument);
         
         const documentName = getModuleDocumentName(loadedDocument);
+        console.log(`\t ${moduleName}.${documentName}`);
 
         var filepath = getSanitisedAndUniqueFilePath(modulePath, `${documentName}`,'_');
         fs.writeFileSync(filepath,serialised );
     }
+    console.log(`<-- Module Documents`);
 }
 
 function getContainingModuleName(container : IStructuralUnit) : string{
